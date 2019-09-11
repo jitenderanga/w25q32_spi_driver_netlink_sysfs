@@ -1,0 +1,21 @@
+Their are 3 main file for userspace:
+spi_netlink.c : simple program perform operations on netlink
+lib_spi.c     : Netlink library used by spi_netlink.c
+lib_spi.h     : header file for library.
+
+
+Library Contain Simple Funcs Like:
+-----------------------------------
+
+netlink_w25q_init: It make a netlink socket and bind it with the kernel.
+netlink_w25q_dest: This operation is performed in the end which destroy the link to kernel netlink.
+w25q_set_offset:   Set the offset for the Device for Writing data.
+w25q_get_offset:   Read offset from the Device  for reading data.
+w25q_read_dev:     Helps read from the device and use the given offset internally
+w25q_write_dev:    Write data to the device.
+
+calls are made like that:
+
+user program --> netlink libs --> socketapi's (sendmsg, recvmsg) --> Driver --> Middle Layer --> controller --> Device
+
+Note: I have not implementeed erase routine for netlink interface. For more info refer to the source code.

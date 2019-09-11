@@ -1,0 +1,68 @@
+Driver for w25q32 using SPI protocol:
+-------------------------------------
+
+Device Info:
+-------------
+The W25Q32 (32M-bit) Serial Flash memory provides a storage solution for systems with limited space, pins and power. 
+The W25Q32 array is organized into 16,384 programmable pages of 256-bytes each. Up to 256 bytes can be programmed at 
+a time. Pages can be erased in groups of 16 (4KB sector erase), groups of 128 (32KB block erase), groups of 256 
+(64KB block erase) or the entire chip (chip erase).
+
+Here only sector erase is only implemented.
+
+As per device manual Device Address is: <0>
+pagesize is 256, address-width 24, and size of device 4194304 (4Mb).
+
+
+Device Node:
+-------------
+This are Two device nodes one for spi0 and other for spi1 on beaglebone black.
+
+property compatible = "winbond, w25q32"	: its specfies the device is compatible with driver with this compatible property.
+reg 				: Device Address        //Here its Chip select, if spi is connected to chipselect 0, then reg = 0, if connected to 1 then reg = 1
+size				: Total size of device
+pagesize			: Page size 
+address-width			: address-width of the device
+spi-max-frequency = <50000>;          //device working frequecy, max 104MHz as per data sheet
+
+driver has to been implemented according to this info. in mind.
+
+Driver Stack:
+----------------
+##########################################################
+
+      User-Space			//User Send info from here
+
+-------------------------
+  
+      Netlink | Sysfs (Kern Abs)
+  
+-------------------------
+
+     SPI client (High Level Driver) 	//Our Driver Layer
+
+-------------------------
+
+     core layer(protocol)
+ 
+-------------------------
+
+     SPI controller
+   
+-------------------------
+
+     SPI Device (w25q32)
+
+############################################################
+
+Working of Driver:
+-------------------
+1) of_device_id struct contain id which is used to match the driver.
+2) Driver Have Been Registered with SPI driver Layer and SPI struct is passed during registration.
+3) When driver is registered it register it self with Middle Layer. 
+   Middle(core) Layer check if any device struct with compatible "winbond, w25q32" is present.
+4) If compatible Propery is matched device probe func is invoked.
+5) Device probe func does all the init. stuff and reterive all the device property.
+6) device is also registerd with sysfs layer and netlink layer.
+7) Files are created in /sys/w25q32_sys and user can use them to communicate to the device.
+8) driver use spi core api to intract with the device the perform read and write ops and erase ops.

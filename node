@@ -1,0 +1,75 @@
+Both node has been tested with spi0 and spi1
+=================================================
+
+Node for spi0		(pins user 17,18,21,22) (1-GND, 3-VCC)
+----------------
+
+/* base address for pin config 0x800 (size 0x234) */
+&am33xx_pinmux {
+	spi0_pin: spi0_test_pinmux { 
+		pinctrl-single-pins = <
+			0x150 (PIN_INPUT_PULLUP | MUX_MODE0)	/* spi0_clk,at 0x950 Address from control module reg. */ 
+			0x154 (PIN_INPUT_PULLUP | MUX_MODE0)	/* spi0_d0,at 0x954 Address from control module reg. */
+			0x158 (PIN_OUTPUT_PULLUP | MUX_MODE0)	/* spi0_d1,at 0x958 Address from control module reg. */
+			0x15c (PIN_OUTPUT_PULLUP | MUX_MODE0)	/* spi0_cs0,at 0x95c Address from control module reg. */
+		>;
+	};
+
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pin>
+
+	status = "okay";	/*default disabled in main node */
+	
+	/* Node for w25q32 flash chip*/
+	w25q32:w25q32@0{
+	compatible = "winbond, w25q32";
+	spi-max-frequency = <50000>;		/*max freq. in device datasheet 104MHz */
+	reg = <0x0>;
+	size = <4194304>;			/* 4Mb=4*1024*1024 */
+	pagesize = <256>;
+	address-width = <24>;
+	};
+};
+
+
+==================================================================================
+Node for spi1		(GPIO pins used 28,29,30,31) (1-GND 3-VCC)
+--------------
+
+/* base address for pin config 0x800 (max offset 0x234)  */
+&am33xx_pinmux {
+        spi1_pin: spi1_test_pinmux {
+                pinctrl-single,pins = <
+                        0x190 (PIN_INPUT_PULLUP | MUX_MODE3)    /* spi0_clk,at 0x950 Address from control module reg. */
+                        0x194 (PIN_INPUT_PULLUP | MUX_MODE3)    /* spi0_d0,at 0x954 Address from control module reg. */
+                        0x198 (PIN_OUTPUT_PULLUP | MUX_MODE3)   /* spi0_d1,at 0x958 Address from control module reg. */
+                        0x19c (PIN_OUTPUT_PULLUP | MUX_MODE3)   /* spi0_cs0,at 0x95c Address from control module reg. */
+                >;
+        };
+
+};
+
+&spi1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&spi1_pin>;
+
+        status = "okay";        /*default disabled in main node */
+
+        /* Node for w25q32 flash chip*/
+        w25q32:w25q32@0{
+                compatible = "winbond, w25q32";
+                spi-max-frequency = <50000>;            /*max freq. in device datasheet 104MHz */
+                reg = <0x0>;
+                size = <4194304>;                       /* 4Mb=4*1024*1024 */
+                pagesize = <256>;
+                address-width = <24>;
+        };
+};
+
+
+
+
+
